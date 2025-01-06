@@ -1,0 +1,168 @@
+openapi: 3.0.3
+info:
+  title: Report Service
+  description: API to generated report
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+    description: Local server
+
+paths:
+  /v1/api/report/client/{id_client}/balances:
+    get:
+      summary: Get all balances of products by client ID
+      operationId: getAccountById
+      parameters:
+        - name: id_client
+          in: path
+          required: true
+          description: Id of account
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Account found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BalanceResponse'
+        '404':
+          description: Account not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/api/report/client/{id_product}/comission:
+    get:
+      summary: Get comission of products by Product ID
+      operationId: getClientBalances
+      parameters:
+        - name: id_product
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: startDate
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+          description: Start date for the commission report
+        - name: endDate
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+          description: End date for the commission report
+      responses:
+        '200':
+          description: Client balances
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComissionResponse'
+        '404':
+          description: Client not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    Account:
+      type: object
+      properties:
+        _id:
+          type: string
+        type:
+          type: string
+          enum: [savings, current, fixed term]
+        balance:
+          type: number
+        numberAccount:
+          type: number
+        transactionCount:
+          type: number
+    Credit:
+      type: object
+      properties:
+        _id:
+          type: string
+        type:
+          type: string
+          enum: [personal, business]
+        amount:
+          type: number
+    CreditCard:
+      type: object
+      properties:
+        _id:
+          type: string
+        type:
+          type: string
+          enum: [personal, business]
+        availableBalance:
+          type: number
+    Commission:
+      type: object
+      properties:
+        _id:
+          type: string
+        accountId:
+          type: string
+        clientId:
+          type: string
+        balance:
+          type: number
+        amount:
+          type: number
+        date:
+          type: string
+          format: date
+        description:
+          type: string
+    BalanceResponse:
+      type: object
+      properties:
+        clientId:
+          type: string
+        balancesCreditCard:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreditCard'
+        balancesCredit:
+          type: array
+          items:
+            $ref: '#/components/schemas/Credit'
+        balancesAccount:
+          type: array
+          items:
+            $ref: '#/components/schemas/Account'
+    ComissionResponse:
+      type: object
+      properties:
+        balancesAccount:
+          type: array
+          items:
+            $ref: '#/components/schemas/Commission'
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
