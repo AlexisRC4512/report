@@ -81,6 +81,38 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /v1/api/report/client-summary/{clientId}:
+    get:
+      summary: Get client summary
+      operationId: getClientSummary
+      parameters:
+        - name: clientId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of the client
+      responses:
+        '200':
+          description: Client summary
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: object
+        '404':
+          description: Client not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
     Account:
@@ -93,10 +125,42 @@ components:
           enum: [savings, current, fixed term]
         balance:
           type: number
-        numberAccount:
+        openingDate:
+          type: string
+          format: date
+        transactionLimit:
           type: number
-        transactionCount:
+        maintenanceFee:
           type: number
+        clientId:
+          type: string
+        holders:
+          type: array
+          items:
+            type: string
+        authorizedSigners:
+          type: array
+          items:
+            type: string
+        transactions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Transaction'
+    Transaction:
+      type: object
+      properties:
+        clientId:
+          type: string
+        type:
+          type: string
+          enum: [deposit, withdrawal]
+        amount:
+          type: number
+        date:
+          type: string
+          format: date
+        description:
+          type: string
     Credit:
       type: object
       properties:
@@ -107,6 +171,32 @@ components:
           enum: [personal, business]
         amount:
           type: number
+        interestRate:
+          type: number
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+        outstandingBalance:
+          type: number
+        clientId:
+          type: string
+        payments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Payment'
+    Payment:
+      type: object
+      properties:
+        amount:
+          type: number
+        date:
+          type: string
+          format: date
+        description:
+          type: string
     CreditCard:
       type: object
       properties:
@@ -115,7 +205,23 @@ components:
         type:
           type: string
           enum: [personal, business]
+        creditLimit:
+          type: number
         availableBalance:
+          type: number
+        issueDate:
+          type: string
+          format: date
+        expirationDate:
+          type: string
+          format: date
+        clientId:
+          type: string
+        transactions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Transaction'
+        numberCreditCard:
           type: number
     Commission:
       type: object
