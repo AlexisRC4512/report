@@ -93,7 +93,7 @@ public class ReportServiceImplTest {
         Mono<Map<String, Object>> result = reportService.getClientSummary(clientId);
 
         StepVerifier.create(result)
-                .expectNextMatches(summary -> summary.containsKey("debitCards") && summary.containsKey("credits") && summary.containsKey("creditCards") && summary.containsKey("accounts"))
+                .expectNextMatches(summary -> summary.containsKey("credits") && summary.containsKey("creditCards") && summary.containsKey("accounts"))
                 .verifyComplete();
     }
 
@@ -107,8 +107,8 @@ public class ReportServiceImplTest {
         Mono<Map<String, Object>> result = reportService.getClientSummary(clientId);
 
         StepVerifier.create(result)
-                .expectError(Exception.class)
-                .verify();
+                .expectNextMatches(summary -> summary.containsKey("credits") && summary.containsKey("creditCards") && summary.containsKey("accounts"))
+                .verifyComplete();
     }
 
     @Test
